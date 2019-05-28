@@ -29,7 +29,10 @@ class Producer implements Runnable {
         }
 
         System.out.println("Producer " + producerId + " completed");
-        _buf.setPRODUCERS(_buf.getPRODUCERS() - 1);
+
+        synchronized (this) {
+            _buf.setPRODUCERS(_buf.getPRODUCERS() - 1);
+        }
 
         System.out.println("Produced total = " + Buffer.PRODUCED_TOTAL);
         System.out.println("Consumed total = " + Buffer.CONSUMED_TOTAL);
@@ -59,7 +62,9 @@ class Consumer implements Runnable {
         }
 
         System.out.println("Consumer " + consumerId + " completed");
-        _buf.setCONSUMERS(_buf.getCONSUMERS() - 1);
+        synchronized (this) {
+            _buf.setCONSUMERS(_buf.getCONSUMERS() - 1);
+        }
 
         System.out.println("Produced total = " + Buffer.PRODUCED_TOTAL);
         System.out.println("Consumed total = " + Buffer.CONSUMED_TOTAL);
@@ -101,6 +106,7 @@ class Buffer {
                 } catch (InterruptedException e) {
                 }
             } else {
+                notifyAll();
                 throw new NoConsumersException();
             }
 
@@ -129,6 +135,7 @@ class Buffer {
                 } catch (InterruptedException e) {
                 }
             } else {
+                notifyAll();
                 throw new NoProducersException();
             }
         }
