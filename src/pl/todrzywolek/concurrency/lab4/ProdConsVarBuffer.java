@@ -91,10 +91,13 @@ class Buffer {
         int numOfResources = rand.nextInt(size / 2) + 1;
         System.out.println("Producer " + Thread.currentThread().getId() + " is putting " + numOfResources + " resources");
 
-        for (int j = 0; j < numOfResources; j++) {
-            putResource(resource + j);
+        try {
+            for (int j = 0; j < numOfResources; j++) {
+                putResource(resource + j);
+            }
+        } finally {
+            notifyAll();
         }
-        notifyAll();
     }
 
     private void putResource(int resource) throws NoConsumersException {
@@ -106,7 +109,6 @@ class Buffer {
                 } catch (InterruptedException e) {
                 }
             } else {
-                notifyAll();
                 throw new NoConsumersException();
             }
 
@@ -120,10 +122,14 @@ class Buffer {
         int numOfResources = rand.nextInt(size / 2) + 1;
         System.out.println("Consumer " + Thread.currentThread().getId() + " is consuming " + numOfResources + " resources");
 
-        for (int j = 0; j < numOfResources; j++) {
-            System.out.println(consumeResource());
+        try {
+            for (int j = 0; j < numOfResources; j++) {
+                System.out.println(consumeResource());
+            }
+        } finally {
+            notifyAll();
         }
-        notifyAll();
+
     }
 
     private Integer consumeResource() throws NoProducersException {
@@ -135,7 +141,6 @@ class Buffer {
                 } catch (InterruptedException e) {
                 }
             } else {
-                notifyAll();
                 throw new NoProducersException();
             }
         }
